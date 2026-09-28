@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Addition">
+<title>Additions-Zettelkasten V2</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f1e8;color:#24303a;font-family:system-ui,-apple-system,sans-serif}
+.wrap{max-width:1000px;margin:auto;padding:25px 18px 40px}h1{text-align:center;margin:0 0 8px;font-size:34px}
+.sub{text-align:center;color:#66717a;margin-bottom:22px}.panel,.game{background:white;border-radius:20px;padding:25px;box-shadow:0 8px 25px #00000012}
+.panel{max-width:720px;margin:auto}h2{text-align:center;margin-top:0}.names{display:grid;gap:10px;margin:18px 0}
+.name{padding:14px 18px;font-size:21px;text-align:left;border:1px solid #bcc4ca;border-radius:12px;background:#fafafa;cursor:pointer}
+.row{display:flex;gap:8px}.row input{flex:1}input,button{font:inherit;border:1px solid #bcc4ca;border-radius:10px;padding:10px 14px;background:#fff}
+button{cursor:pointer;font-weight:600}.primary{background:#24303a;color:white}.choice{margin:22px 0;padding:18px;border:1px solid #d1d6da;border-radius:14px;background:#fafafa}
+.choice h3{margin:0 0 12px;text-align:center}.checks{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
+.check{display:flex;align-items:center;justify-content:center;gap:5px;padding:10px 5px;background:white;border:1px solid #ccd2d6;border-radius:9px;cursor:pointer}
+.check input{width:19px;height:19px;padding:0}.hint{text-align:center;color:#66717a;font-size:14px;margin-top:10px}
+.top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.paused{opacity:.65}.student{font-size:22px;font-weight:700}
+.task{text-align:center;font-size:64px;font-weight:700;margin:18px 0}.answer{text-align:center}#answer{width:180px;text-align:center;font-size:28px}
+.feedback{text-align:center;min-height:82px;margin-top:18px;font-size:21px;font-weight:600}.feedback small{display:block;font-weight:400;margin-top:7px;color:#66717a}
+.where{text-align:center;color:#66717a}.boxes{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-top:20px}
+.box{min-height:100px;border:2px solid #c7cdd1;border-radius:12px;padding:9px;text-align:center;background:#fafafa}.box strong{display:block}.count{font-size:27px;font-weight:700}
+.note{text-align:center;color:#66717a;font-size:14px;line-height:1.45;margin-top:18px}.hidden{display:none!important}
+.overlay{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;padding:18px}
+.diploma{background:white;max-width:760px;width:100%;padding:42px 30px;text-align:center;border:8px double #24303a}.diploma h2{font-size:42px}.dname{font-size:36px;font-weight:800}.king{font-size:27px;margin:18px}.actions{display:flex;justify-content:center;gap:10px}
+@media print{body *{visibility:hidden!important}.overlay,.overlay *{visibility:visible!important}.overlay{position:static;background:white;padding:0}.diploma{max-width:none}.actions{display:none}}
+@media(max-width:700px){.boxes{grid-template-columns:repeat(3,1fr)}.checks{grid-template-columns:repeat(2,1fr)}.task{font-size:48px}.row{flex-direction:column}}
+
+.equation{display:flex;align-items:center;justify-content:center;gap:14px;margin:18px auto 10px;min-height:88px}.equation .task{margin:0}.answerbox{display:flex;align-items:center;gap:10px;flex:0 0 auto}
+#answerDisplay{height:72px;width:180px;border:2px solid #bcc4ca;border-radius:14px;background:#fafafa;font-size:40px;font-weight:750;text-align:center;padding:10px}
+.timer{text-align:center;font-size:22px;font-weight:750;min-height:30px}
+.timerbar{height:8px;background:#e1e4e6;border-radius:99px;overflow:hidden;max-width:470px;margin:5px auto 10px}
+.timerbar span{display:block;height:100%;width:100%;background:#24303a}
+.keypadWrap{max-width:470px;margin:auto;display:flex;align-items:center;gap:8px}.keypad{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.key{font-size:27px;padding:13px 8px;min-height:58px}
+.key.action{font-size:18px}.key.zero{grid-column:2}.key.ok{background:#24303a;color:#fff}.submitKey{font-size:42px;min-width:105px;min-height:105px;align-self:center}
+.teacher{background:#fff;border-radius:20px;padding:22px;box-shadow:0 8px 25px #00000012;max-width:1000px;margin:auto}
+.teacherHeader{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.teacherTable{width:100%;border-collapse:collapse;margin-top:15px}
+.teacherTable th,.teacherTable td{border-bottom:1px solid #d9dde0;padding:9px 6px;text-align:left}
+.teacherTable th{font-size:13px;color:#66717a}
+.tActions button{padding:6px 8px;font-size:12px}.teacherTable select{font:inherit;padding:5px 7px;border:1px solid #bcc4ca;border-radius:8px;background:#fff}
+@media(max-width:700px){.equation{gap:8px;justify-content:center}.equation .task{font-size:42px}.answerbox #answerDisplay{width:115px}.keypadWrap{max-width:470px}.submitKey{min-width:105px;min-height:105px}.key{min-height:56px}}
+#pauseNotice{text-align:center;font-size:27px;font-weight:700;margin:36px auto;line-height:1.7;min-height:220px}#pauseNotice small{font-size:18px;font-weight:400}.modebuttons{display:flex;justify-content:center;gap:10px;margin-bottom:22px;flex-wrap:wrap}@media(max-width:500px){.equation .task{font-size:33px!important}.answerbox #answerDisplay{width:95px!important;font-size:31px}.submitKey{min-width:78px}.key{padding:8px 4px}}
+</style></head>
+<body>
+<div class="wrap">
+<h1>➖ Subtraktions-Zettelkasten</h1>
+<div class="sub">Bis 10 im Zettelkasten – danach passt sich das Programm automatisch an.</div>
+
+<section id="start" class="panel">
+<div class="modebuttons"><button id="studentMode" class="primary">👧 Schülerbildschirm</button><button id="teacherMode">👩‍🏫 Lehrerbildschirm</button></div>
+<h2>Wer übt heute?</h2><div id="names" class="names"></div>
+<div class="row"><input id="newName" maxlength="30" placeholder="Name des Kindes"><button id="add" class="primary">Name hinzufügen</button></div>
+
+</section>
+
+<section id="game" class="game hidden">
+<div class="top"><div id="student" class="student"></div><div><button id="pauseBtn">⏸ Pause</button> <button id="back">← Zurück</button></div></div>
+<div id="selectedInfo" class="hint"></div><div id="pauseNotice" class="hidden" role="status">⏸ Pause – die Aufgabe ist ausgeblendet.<br><small>Mit „Weiter“ setzt du die Aufgabe fort.</small></div><div id="exerciseArea">
+<div class="equation"><div id="task" class="task"></div><div class="answerbox"><div id="answerDisplay"></div></div></div>
+<div id="timer" class="timer" aria-hidden="true"></div>
+<div class="timerbar"><span id="timerbar"></span></div>
+<div id="feedback" class="feedback"></div>
+<div class="keypadWrap"><div class="keypad">
+<button class="key" data-key="1">1</button><button class="key" data-key="2">2</button><button class="key" data-key="3">3</button>
+<button class="key" data-key="4">4</button><button class="key" data-key="5">5</button><button class="key" data-key="6">6</button>
+<button class="key" data-key="7">7</button><button class="key" data-key="8">8</button><button class="key" data-key="9">9</button>
+<button class="key action" data-key="clear">C</button><button class="key zero" data-key="0">0</button><button class="key action" data-key="back">⌫</button></div><button class="key ok submitKey" data-key="ok" aria-label="Antwort abschicken">✓</button></div></div>
+</section></div>
+
+<section id="teacher" class="teacher hidden">
+<div class="teacherHeader"><h2>👩‍🏫 Lehrerbildschirm</h2><button id="teacherBack">← Schülerbildschirm</button></div>
+<div class="hint">Die Lehrkraft wählt den Lernweg. „Bis 10“ arbeitet mit dem Zettelkasten. Das erweiterte Programm startet mit Aufgaben bis 20 und passt die Schwierigkeit unsichtbar an: 10 richtige Aufgaben führen eine Stufe höher, 5 falsche eine Stufe tiefer. Aus der Vorstufe geht es zurück in den Zettelkasten.</div>
+<div style="text-align:center;margin:12px 0">
+<button id="export">💾 Lernstände sichern</button>
+<button id="clearAll">⚠️ Alle Lernstände löschen</button>
+<button id="changePassword">🔑 Passwort ändern</button>
+</div>
+<div style="overflow:auto"><table class="teacherTable">
+<thead><tr><th>Kind</th><th>Lernweg</th><th>Stand</th><th>richtig</th><th>falsch</th><th></th></tr></thead>
+<tbody id="teacherRows"></tbody>
+</table></div>
+</section>
+<div id="overlay" class="overlay hidden"><div class="diploma"><div style="font-size:48px">🏆</div><h2>Diplom</h2><div id="dname" class="dname"></div><div class="king">Du bist jetzt ein <strong>Minuskönig!</strong> 👑</div><p>Prima! Du hast alle Aufgaben aus deinem Übungssatz sicher gelernt!</p><div class="actions"><button id="print" class="primary">🖨️ Diplom ausdrucken</button><button id="close">Weiter üben</button></div></div></div>
+
+<script>
+"use strict";
+const KEY="subtraktionsZettelkastenV1", OLDKEY="subtraktionsZettelkastenV1", PASSKEY="subtraktionTeacherPassword";
+const $=id=>document.getElementById(id);
+let data;try{data=JSON.parse(localStorage.getItem(KEY))||JSON.parse(localStorage.getItem(OLDKEY))||{students:{}}}catch(e){data={students:{}}}
+if(!data.students||typeof data.students!=="object")data={students:{}};
+
+let currentName="",card=null,busy=false,paused=false,answer="",lastCardKey="",remainingMs=15000,startTime=0,timerId=null,nextId=null,session=0;
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+function zPool(){let out=[];for(let a=0;a<=10;a++)for(let b=0;b<=10;b++)if(a+b<=10)out.push({a,b,box:1});return out}
+function key(c){return c.a+"+"+c.b}
+function canon(a,b){return Math.min(a,b)+"+"+Math.max(a,b)}
+function normalizeZettelCards(s){
+ let old=new Map((Array.isArray(s.cards)?s.cards:[]).map(c=>[key(c),c]));
+ s.cards=zPool().map(c=>{let prev=old.get(key(c));return {...c,box:Math.min(6,Math.max(1,Number(prev&&prev.box)||1))}});
+}
+function student(n){
+ if(!data.students[n])data.students[n]={mode:"zettel",cards:zPool(),level:0,right:0,wrong:0,used:{}};
+ let s=data.students[n];
+ if(!s.mode){s.mode=s.high&&!s.low?"adaptive":"zettel";delete s.low;delete s.high}
+ if(s.mode==="zettel"){
+   let valid=Array.isArray(s.cards)&&s.cards.length===66&&s.cards.every(c=>Number.isFinite(c.a)&&Number.isFinite(c.b)&&c.a+c.b<=10);
+   if(!valid)normalizeZettelCards(s);
+ }else if(!Array.isArray(s.cards)){s.cards=zPool()}
+ if(!Number.isInteger(s.level))s.level=0;if(!Number.isInteger(s.right))s.right=0;if(!Number.isInteger(s.wrong))s.wrong=0;
+ if(!s.used||typeof s.used!=="object")s.used={};
+ return s
+}
+function levelName(l){return ["bis 20","Zehner + Zehner","Zehner + Einer","ZE + E ohne Übergang","ZE + Z","ZE + ZE ohne Übergang","mit Zehnerübergang"][l]||"bis 20"}
+function label(s){return s.mode==="zettel"?"Bis 10 – Zettelkasten":"Erweitertes Programm – "+levelName(s.level)}
+function setMode(s,mode){if(s.mode===mode){if(mode==="zettel")normalizeZettelCards(s);save();return}s.mode=mode;s.right=0;s.wrong=0;if(mode==="zettel"){s.cards=zPool()}else{s.level=0;s.used={}}save()}
+function names(){$("names").replaceChildren();let ns=Object.keys(data.students);if(!ns.length){let d=document.createElement("div");d.className="hint";d.textContent="Noch keine Namen eingetragen.";$('names').append(d)}ns.forEach(n=>{let b=document.createElement("button");b.className="name";b.textContent="👤 "+n;b.onclick=()=>begin(n);$("names").append(b)})}
+function stopTimers(){clearInterval(timerId);clearTimeout(nextId);timerId=nextId=null;session++}
+function showStart(){stopTimers();card=null;busy=false;paused=false;currentName="";$("game").classList.add("hidden");$("teacher").classList.add("hidden");$("start").classList.remove("hidden");$("newName").value="";names()}
+function begin(n){stopTimers();currentName=n;let s=student(n);save();$("student").textContent="👤 "+n;$("selectedInfo").textContent="Übungsbereich: "+label(s);$("start").classList.add("hidden");$("teacher").classList.add("hidden");$("game").classList.remove("hidden");busy=false;pick()}
+function setAnswer(v){answer=v;$("answerDisplay").textContent=v}
+function updatePause(){$("pauseBtn").textContent=paused?"▶ Weiter":"⏸ Pause";$("exerciseArea").classList.toggle("hidden",paused);$("pauseNotice").classList.toggle("hidden",!paused)}
+function tick(){if(paused||busy)return;let left=Math.max(0,remainingMs-(performance.now()-startTime));$("timerbar").style.width=(left/150)+"%";if(left<=0)finish(null)}
+function adaptivePool(level){let out=[];
+ if(level===0){for(let a=1;a<=19;a++)for(let b=1;b<=19;b++){let sum=a+b;if(sum>=11&&sum<=20)out.push({a,b})}}
+ if(level===1){for(let a=10;a<=90;a+=10)for(let b=10;b<=90;b+=10)if(a+b<=100)out.push({a,b})}
+ if(level===2){for(let a=10;a<=90;a+=10)for(let b=1;b<=9;b++)if(a+b<=99)out.push({a,b})}
+ if(level===3){for(let a=11;a<=98;a++)if(a%10)for(let b=1;b<=9;b++)if((a%10)+b<10&&a+b<=99)out.push({a,b})}
+ if(level===4){for(let a=11;a<=99;a++)if(a%10)for(let b=10;b<=80;b+=10)if(a+b<=99)out.push({a,b})}
+ if(level===5){for(let a=11;a<=88;a++)if(a%10)for(let b=11;b<=88;b++)if(b%10&&a+b<=99&&(a%10)+(b%10)<10)out.push({a,b})}
+ if(level===6){for(let a=11;a<=98;a++)for(let b=1;b<=88;b++)if(a+b<=100&&(a%10)+(b%10)>=10)out.push({a,b})}
+ let m=new Map();for(const c of out)m.set(canon(c.a,c.b),c);return [...m.values()]
+}
+function chooseAdaptive(s){let p=adaptivePool(s.level);if(!p.length)return null;if(!Array.isArray(s.used[s.level]))s.used[s.level]=[];let used=s.used[s.level];let unused=p.filter(c=>!used.includes(canon(c.a,c.b)));if(!unused.length){s.used[s.level]=[];used=s.used[s.level];unused=p}
+ let choices=unused.filter(c=>canon(c.a,c.b)!==lastCardKey);if(choices.length)unused=choices;let c=unused[Math.floor(Math.random()*unused.length)];if(!c)return null;s.used[s.level].push(canon(c.a,c.b));save();return c
+}
+function pick(){stopTimers();let s=student(currentName);
+ if(s.mode==="zettel"){let available=s.cards.filter(c=>c.box<6);if(!available.length){showDiploma();return}let others=available.filter(c=>key(c)!==lastCardKey);if(others.length)available=others;const weights=[0,65,15,9,6,4];let total=available.reduce((n,c)=>n+weights[c.box],0),r=Math.random()*total;card=available.find(c=>(r-=weights[c.box])<0)||available[0];lastCardKey=key(card)}
+ else{card=chooseAdaptive(s);if(!card){s.mode="zettel";normalizeZettelCards(s);save();return pick()}lastCardKey=canon(card.a,card.b)}
+ busy=false;paused=false;setAnswer("");$("task").textContent=(card.a+card.b)+" − "+card.b+" =";$("feedback").textContent="";$("selectedInfo").textContent="Übungsbereich: "+label(s);updatePause();if(s.mode==="zettel"){remainingMs=15000;$("timerbar").parentElement.classList.remove("hidden");startTime=performance.now();timerId=setInterval(tick,50);tick()}else{remainingMs=15000;$("timerbar").parentElement.classList.add("hidden");$("timerbar").style.width="100%"}
+}
+function finish(value){if(busy||paused||!card)return;busy=true;clearInterval(timerId);timerId=null;let s=student(currentName),solution=card.a,correct=value!==null&&Number(value)===solution;
+ if(s.mode==="zettel"){if(value!==null){if(correct)card.box=Math.min(6,card.box+1);else card.box=1}}
+ else if(value!==null){if(correct)s.right++;else s.wrong++;
+   if(s.right>=10){s.level=Math.min(6,s.level+1);s.right=0;s.wrong=0}
+   else if(s.wrong>=5){if(s.level===0){s.mode="zettel";s.cards=zPool()}else s.level--;s.right=0;s.wrong=0}
+ }
+ setAnswer(String(solution));$("feedback").textContent="";save();nextId=setTimeout(()=>{busy=false;nextId=null;pick()},2000)
+}
+function submit(){if(!answer)return;finish(answer)}
+function showDiploma(){$("dname").textContent=currentName;$("overlay").classList.remove("hidden")}
+function renderTeacher(){let tb=$("teacherRows");tb.replaceChildren();Object.keys(data.students).forEach(n=>{let s=student(n),tr=document.createElement("tr");let name=document.createElement("td"),strong=document.createElement("strong");strong.textContent=n;name.append(strong);tr.append(name);
+ let mode=document.createElement("td"),sel=document.createElement("select");[["zettel","Bis 10 – Zettelkasten"],["adaptive","Erweitertes Programm (Start bis 20)"]].forEach(([v,t])=>{let o=document.createElement("option");o.value=v;o.textContent=t;o.selected=s.mode===v;sel.append(o)});sel.onchange=()=>{setMode(s,sel.value);renderTeacher()};mode.append(sel);tr.append(mode);
+ let stand=document.createElement("td");stand.textContent=s.mode==="zettel"?"Zettelkasten":levelName(s.level);tr.append(stand);let rr=document.createElement("td");rr.textContent=s.mode==="adaptive"?s.right:"–";tr.append(rr);let ww=document.createElement("td");ww.textContent=s.mode==="adaptive"?s.wrong:"–";tr.append(ww);
+ let actions=document.createElement("td");actions.className="tActions";let open=document.createElement("button");open.textContent="Öffnen";open.onclick=()=>begin(n);let del=document.createElement("button");del.textContent="Löschen";del.onclick=()=>{if(confirm("Lernstand von "+n+" löschen?")){delete data.students[n];save();renderTeacher();names()}};actions.append(open," ",del);tr.append(actions);tb.append(tr)})}
+$("add").onclick=()=>{let n=$("newName").value.trim();if(!n)return;student(n);save();begin(n)};
+$("newName").onkeydown=e=>{if(e.key==="Enter")$("add").click()};
+document.querySelectorAll("[data-key]").forEach(b=>b.onclick=()=>{if(busy||paused||!card)return;let k=b.dataset.key;if(k==="ok")submit();else if(k==="clear")setAnswer("");else if(k==="back")setAnswer(answer.slice(0,-1));else if(answer.length<3)setAnswer(answer+k)});
+document.addEventListener("keydown",e=>{if($("game").classList.contains("hidden")||busy||paused||!card||["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName))return;if(/^\d$/.test(e.key)){e.preventDefault();if(answer.length<3)setAnswer(answer+e.key)}else if(e.key==="Enter"){e.preventDefault();submit()}else if(e.key==="Backspace"){e.preventDefault();setAnswer(answer.slice(0,-1))}else if(e.key==="Escape"||e.key==="Delete"){e.preventDefault();setAnswer("")}});
+$("pauseBtn").onclick=()=>{if(busy||!card)return;let s=student(currentName);if(!paused){if(s.mode==="zettel"){remainingMs=Math.max(0,remainingMs-(performance.now()-startTime));clearInterval(timerId);timerId=null}paused=true}else{paused=false;if(s.mode==="zettel"){startTime=performance.now();timerId=setInterval(tick,50);tick()}}updatePause()};
+$("back").onclick=showStart;$("studentMode").onclick=showStart;
+$("teacherMode").onclick=()=>{let entered=prompt("Lehrerbereich – Passwort eingeben:");if(entered===(localStorage.getItem(PASSKEY)||"4711")){$("start").classList.add("hidden");$("teacher").classList.remove("hidden");renderTeacher()}else if(entered!==null)alert("Passwort nicht korrekt.")};
+$("teacherBack").onclick=showStart;
+$("changePassword").onclick=()=>{let old=localStorage.getItem(PASSKEY)||"4711",v=prompt("Aktuelles Lehrerpasswort:");if(v!==old){if(v!==null)alert("Passwort nicht korrekt.");return}let next=prompt("Neues Lehrerpasswort (mindestens 4 Zeichen):");if(next===null)return;if(next.trim().length<4){alert("Mindestens 4 Zeichen erforderlich.");return}localStorage.setItem(PASSKEY,next.trim());alert("Passwort geändert.")};
+$("clearAll").onclick=()=>{if(confirm("Wirklich ALLE Lernstände löschen?")){data={students:{}};save();renderTeacher();names()}};
+$("export").onclick=()=>{let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="subtraktion-lernstaende.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+$("print").onclick=()=>window.print();$("close").onclick=()=>{$("overlay").classList.add("hidden");showStart()};
+names();
+</script></body></html>
