@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Subtraktion">
-<title>Subtraktions-Zettelkasten</title>
+<meta name="apple-mobile-web-app-title" content="Addition">
+<title>Additions-Zettelkasten V2</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f4f1e8;color:#24303a;font-family:system-ui,-apple-system,sans-serif}
 .wrap{max-width:1000px;margin:auto;padding:25px 18px 40px}h1{text-align:center;margin:0 0 8px;font-size:34px}
@@ -29,11 +29,11 @@ button{cursor:pointer;font-weight:600}.primary{background:#24303a;color:white}.c
 @media(max-width:700px){.boxes{grid-template-columns:repeat(3,1fr)}.checks{grid-template-columns:repeat(2,1fr)}.task{font-size:48px}.row{flex-direction:column}}
 
 .equation{display:flex;align-items:center;justify-content:center;gap:14px;margin:18px auto 10px;min-height:88px}.equation .task{margin:0}.answerbox{display:flex;align-items:center;gap:10px;flex:0 0 auto}
-#answerDisplay{height:72px;width:180px;border:2px solid #bcc4ca;border-radius:14px;background:#fafafa;font-size:40px;font-weight:750;text-align:center;padding:10px}
+#answerDisplay{height:88px;width:210px;border:2px solid #bcc4ca;border-radius:14px;background:#fafafa;font-size:64px;font-weight:700;text-align:center;padding:4px 10px;line-height:78px}
 .timer{text-align:center;font-size:22px;font-weight:750;min-height:30px}
 .timerbar{height:8px;background:#e1e4e6;border-radius:99px;overflow:hidden;max-width:470px;margin:5px auto 10px}
 .timerbar span{display:block;height:100%;width:100%;background:#24303a}
-.keypadWrap{max-width:470px;margin:auto;display:flex;align-items:center;gap:8px}.keypad{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.keypadWrap{max-width:470px;margin:-0.5cm auto 0;display:flex;align-items:center;gap:8px}.keypad{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .key{font-size:27px;padding:13px 8px;min-height:58px}
 .key.action{font-size:18px}.key.zero{grid-column:2}.key.ok{background:#24303a;color:#fff}.submitKey{font-size:42px;min-width:105px;min-height:105px;align-self:center}
 .teacher{background:#fff;border-radius:20px;padding:22px;box-shadow:0 8px 25px #00000012;max-width:1000px;margin:auto}
@@ -42,8 +42,9 @@ button{cursor:pointer;font-weight:600}.primary{background:#24303a;color:white}.c
 .teacherTable th,.teacherTable td{border-bottom:1px solid #d9dde0;padding:9px 6px;text-align:left}
 .teacherTable th{font-size:13px;color:#66717a}
 .tActions button{padding:6px 8px;font-size:12px}.teacherTable select{font:inherit;padding:5px 7px;border:1px solid #bcc4ca;border-radius:8px;background:#fff}
-@media(max-width:700px){.equation{gap:8px;justify-content:center}.equation .task{font-size:42px}.answerbox #answerDisplay{width:115px}.keypadWrap{max-width:470px}.submitKey{min-width:105px;min-height:105px}.key{min-height:56px}}
-#pauseNotice{text-align:center;font-size:27px;font-weight:700;margin:36px auto;line-height:1.7;min-height:220px}#pauseNotice small{font-size:18px;font-weight:400}.modebuttons{display:flex;justify-content:center;gap:10px;margin-bottom:22px;flex-wrap:wrap}@media(max-width:500px){.equation .task{font-size:33px!important}.answerbox #answerDisplay{width:95px!important;font-size:31px}.submitKey{min-width:78px}.key{padding:8px 4px}}
+@media(max-width:700px){.equation{gap:8px;justify-content:center}.equation .task{font-size:42px}.answerbox #answerDisplay{width:145px;height:68px;font-size:42px;line-height:58px}.keypadWrap{max-width:470px}.submitKey{min-width:105px;min-height:105px}.key{min-height:56px}}
+#pauseNotice{text-align:center;font-size:27px;font-weight:700;margin:36px auto;line-height:1.7;min-height:220px}#pauseNotice small{font-size:18px;font-weight:400}.modebuttons{display:flex;justify-content:center;gap:10px;margin-bottom:22px;flex-wrap:wrap}@media(max-width:500px){.equation .task{font-size:33px!important}.answerbox #answerDisplay{width:95px!important;font-size:33px!important;line-height:58px}.submitKey{min-width:78px}.key{padding:8px 4px}}
+.teacherBoxes{display:grid;grid-template-columns:repeat(6,minmax(55px,1fr));gap:5px}.teacherBoxes>div{border:1px solid #c7cdd1;border-radius:8px;background:#fafafa;padding:7px 5px;text-align:center}.teacherBoxes span{display:block;font-size:12px}.teacherBoxes strong{display:block;font-size:22px}
 </style></head>
 <body>
 <div class="wrap">
@@ -80,7 +81,7 @@ button{cursor:pointer;font-weight:600}.primary{background:#24303a;color:white}.c
 <button id="changePassword">🔑 Passwort ändern</button>
 </div>
 <div style="overflow:auto"><table class="teacherTable">
-<thead><tr><th>Kind</th><th>Lernweg</th><th>Stand</th><th>richtig</th><th>falsch</th><th></th></tr></thead>
+<thead><tr><th>Kind</th><th>Lernweg</th><th>Stand</th><th>F1</th><th>F2</th><th>F3</th><th>F4</th><th>F5</th><th>⭐F6</th><th>richtig</th><th>falsch</th><th></th></tr></thead>
 <tbody id="teacherRows"></tbody>
 </table></div>
 </section>
@@ -154,7 +155,7 @@ function submit(){if(!answer)return;finish(answer)}
 function showDiploma(){$("dname").textContent=currentName;$("overlay").classList.remove("hidden")}
 function renderTeacher(){let tb=$("teacherRows");tb.replaceChildren();Object.keys(data.students).forEach(n=>{let s=student(n),tr=document.createElement("tr");let name=document.createElement("td"),strong=document.createElement("strong");strong.textContent=n;name.append(strong);tr.append(name);
  let mode=document.createElement("td"),sel=document.createElement("select");[["zettel","Bis 10 – Zettelkasten"],["adaptive","Erweitertes Programm (Start bis 20)"]].forEach(([v,t])=>{let o=document.createElement("option");o.value=v;o.textContent=t;o.selected=s.mode===v;sel.append(o)});sel.onchange=()=>{setMode(s,sel.value);renderTeacher()};mode.append(sel);tr.append(mode);
- let stand=document.createElement("td");stand.textContent=s.mode==="zettel"?"Zettelkasten":levelName(s.level);tr.append(stand);let rr=document.createElement("td");rr.textContent=s.mode==="adaptive"?s.right:"–";tr.append(rr);let ww=document.createElement("td");ww.textContent=s.mode==="adaptive"?s.wrong:"–";tr.append(ww);
+ let stand=document.createElement("td");stand.textContent=s.mode==="zettel"?"Zettelkasten":levelName(s.level);tr.append(stand);for(let i=1;i<=6;i++){let td=document.createElement("td");td.textContent=s.mode==="zettel"?s.cards.filter(c=>c.box===i).length:"";tr.append(td)}let rr=document.createElement("td");rr.textContent=s.mode==="adaptive"?s.right:"";tr.append(rr);let ww=document.createElement("td");ww.textContent=s.mode==="adaptive"?s.wrong:"";tr.append(ww);
  let actions=document.createElement("td");actions.className="tActions";let open=document.createElement("button");open.textContent="Öffnen";open.onclick=()=>begin(n);let del=document.createElement("button");del.textContent="Löschen";del.onclick=()=>{if(confirm("Lernstand von "+n+" löschen?")){delete data.students[n];save();renderTeacher();names()}};actions.append(open," ",del);tr.append(actions);tb.append(tr)})}
 $("add").onclick=()=>{let n=$("newName").value.trim();if(!n)return;student(n);save();begin(n)};
 $("newName").onkeydown=e=>{if(e.key==="Enter")$("add").click()};
