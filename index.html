@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Subtraktion">
-<title>Subtraktions-Zettelkasten</title>
+<meta name="apple-mobile-web-app-title" content="Addition">
+<title>Additions-Zettelkasten V2</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f4f1e8;color:#24303a;font-family:system-ui,-apple-system,sans-serif}
 .wrap{max-width:1000px;margin:auto;padding:25px 18px 40px}h1{text-align:center;margin:0 0 8px;font-size:34px}
@@ -45,6 +45,15 @@ button{cursor:pointer;font-weight:600}.primary{background:#24303a;color:white}.c
 @media(max-width:700px){.equation{gap:8px;justify-content:center}.equation .task{font-size:42px}.answerbox #answerDisplay{width:145px;height:68px;font-size:42px;line-height:58px}.keypadWrap{max-width:470px}.submitKey{min-width:105px;min-height:105px}.key{min-height:56px}}
 #pauseNotice{text-align:center;font-size:27px;font-weight:700;margin:36px auto;line-height:1.7;min-height:220px}#pauseNotice small{font-size:18px;font-weight:400}.modebuttons{display:flex;justify-content:center;gap:10px;margin-bottom:22px;flex-wrap:wrap}@media(max-width:500px){.equation .task{font-size:33px!important}.answerbox #answerDisplay{width:95px!important;font-size:33px!important;line-height:58px}.submitKey{min-width:78px}.key{padding:8px 4px}}
 .teacherBoxes{display:grid;grid-template-columns:repeat(6,minmax(55px,1fr));gap:5px}.teacherBoxes>div{border:1px solid #c7cdd1;border-radius:8px;background:#fafafa;padding:7px 5px;text-align:center}.teacherBoxes span{display:block;font-size:12px}.teacherBoxes strong{display:block;font-size:22px}
+.practiceLayout{display:grid;grid-template-columns:minmax(0,1fr) 52px;gap:12px;align-items:center}
+.starColumn{display:flex;flex-direction:column-reverse;align-items:center;gap:2px;padding:12px 4px;border-radius:18px;background:#faf7ed;border:1px solid #ece4cc}
+.progressStar{display:block;font-size:29px;line-height:1.15;color:#d1d5d8}
+.progressStar.earned{color:#d99a13}
+.starMessage{text-align:center;color:#a5750d;font-weight:700;font-size:14px;min-height:20px;margin-top:6px}
+@media(max-width:700px){.game{padding:18px 12px}.practiceLayout{grid-template-columns:minmax(0,1fr) 35px;gap:5px}.progressStar{font-size:25px}.starColumn{padding:10px 2px}.equation{gap:5px}.answerbox #answerDisplay{width:100px}.submitKey{min-width:78px}}
+@media(max-width:500px){.equation .task{font-size:28px!important}.answerbox #answerDisplay{width:74px!important;font-size:28px}.submitKey{min-width:55px;min-height:80px;font-size:34px}.keypadWrap{gap:5px}.keypad{gap:5px}.key{font-size:24px}.progressStar{font-size:23px}}
+
+
 </style></head>
 <body>
 <div class="wrap">
@@ -61,7 +70,7 @@ button{cursor:pointer;font-weight:600}.primary{background:#24303a;color:white}.c
 <section id="game" class="game hidden">
 <div class="top"><div id="student" class="student"></div><div><button id="pauseBtn">⏸ Pause</button> <button id="back">← Zurück</button></div></div>
 <div id="selectedInfo" class="hint"></div><div id="pauseNotice" class="hidden" role="status">⏸ Pause – die Aufgabe ist ausgeblendet.<br><small>Mit „Weiter“ setzt du die Aufgabe fort.</small></div><div id="exerciseArea">
-<div class="equation"><div id="task" class="task"></div><div class="answerbox"><div id="answerDisplay"></div></div></div>
+<div class="practiceLayout"><div class="practiceMain"><div class="equation"><div id="task" class="task"></div><div class="answerbox"><div id="answerDisplay"></div></div></div>
 <div id="timer" class="timer" aria-hidden="true"></div>
 <div class="timerbar"><span id="timerbar"></span></div>
 <div id="feedback" class="feedback"></div>
@@ -69,7 +78,7 @@ button{cursor:pointer;font-weight:600}.primary{background:#24303a;color:white}.c
 <button class="key" data-key="1">1</button><button class="key" data-key="2">2</button><button class="key" data-key="3">3</button>
 <button class="key" data-key="4">4</button><button class="key" data-key="5">5</button><button class="key" data-key="6">6</button>
 <button class="key" data-key="7">7</button><button class="key" data-key="8">8</button><button class="key" data-key="9">9</button>
-<button class="key action" data-key="clear">C</button><button class="key zero" data-key="0">0</button><button class="key action" data-key="back">⌫</button></div><button class="key ok submitKey" data-key="ok" aria-label="Antwort abschicken">✓</button></div></div>
+<button class="key action" data-key="clear">C</button><button class="key zero" data-key="0">0</button><button class="key action" data-key="back">⌫</button></div><button class="key ok submitKey" data-key="ok" aria-label="Antwort abschicken">✓</button></div></div><aside aria-label="Dein Fortschritt"><div id="starColumn" class="starColumn" role="img"></div><div id="starMessage" class="starMessage" role="status"></div></aside></div></div>
 </section></div>
 
 <section id="teacher" class="teacher hidden">
@@ -95,6 +104,19 @@ let data;try{data=JSON.parse(localStorage.getItem(KEY))||JSON.parse(localStorage
 if(!data.students||typeof data.students!=="object")data={students:{}};
 
 let currentName="",card=null,busy=false,paused=false,answer="",lastCardKey="",remainingMs=15000,startTime=0,timerId=null,nextId=null,session=0;
+function updateStars(){
+ if(!currentName)return;
+ const s=student(currentName);
+ if(!s.starProgress||typeof s.starProgress!=="object"||Array.isArray(s.starProgress))s.starProgress={};
+ const mode=s.mode;
+ const progress=s.cards.reduce((sum,c)=>sum+Math.min(5,Math.max(0,(Number(c.box)||1)-1)),0);
+ const earned=mode==="zettel"?(s.cards.length?Math.floor(10*progress/(s.cards.length*5)):0):Math.min(10,Math.max(0,s.level)+(Number(s.topStarRounds)||0));
+ const count=Math.max(Math.min(10,Math.max(0,Number(s.starProgress[mode])||0)),earned);
+ s.starProgress[mode]=count;
+ const column=$("starColumn");column.replaceChildren();
+ for(let i=0;i<10;i++){const star=document.createElement("span");star.className="progressStar"+(i<count?" earned":"");star.textContent=i<count?"★":"☆";star.setAttribute("aria-hidden","true");column.append(star)}
+ column.setAttribute("aria-label",count+" von 10 Sternen erreicht");$("starMessage").textContent=count===10?"Super!":"";
+}
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}
 function zPool(){let out=[];for(let a=0;a<=10;a++)for(let b=0;b<=10;b++)if(a+b<=10)out.push({a,b,box:1});return out}
 function key(c){return c.a+"+"+c.b}
@@ -121,7 +143,7 @@ function setMode(s,mode){if(s.mode===mode){if(mode==="zettel")normalizeZettelCar
 function names(){$("names").replaceChildren();let ns=Object.keys(data.students);if(!ns.length){let d=document.createElement("div");d.className="hint";d.textContent="Noch keine Namen eingetragen.";$('names').append(d)}ns.forEach(n=>{let b=document.createElement("button");b.className="name";b.textContent="👤 "+n;b.onclick=()=>begin(n);$("names").append(b)})}
 function stopTimers(){clearInterval(timerId);clearTimeout(nextId);timerId=nextId=null;session++}
 function showStart(){stopTimers();card=null;busy=false;paused=false;currentName="";$("game").classList.add("hidden");$("teacher").classList.add("hidden");$("start").classList.remove("hidden");$("newName").value="";names()}
-function begin(n){stopTimers();currentName=n;let s=student(n);save();$("student").textContent="👤 "+n;$("selectedInfo").textContent="Übungsbereich: "+label(s);$("start").classList.add("hidden");$("teacher").classList.add("hidden");$("game").classList.remove("hidden");busy=false;pick()}
+function begin(n){stopTimers();currentName=n;let s=student(n);updateStars();save();$("student").textContent="👤 "+n;$("selectedInfo").textContent="Übungsbereich: "+label(s);$("start").classList.add("hidden");$("teacher").classList.add("hidden");$("game").classList.remove("hidden");busy=false;pick()}
 function setAnswer(v){answer=v;$("answerDisplay").textContent=v}
 function updatePause(){$("pauseBtn").textContent=paused?"▶ Weiter":"⏸ Pause";$("exerciseArea").classList.toggle("hidden",paused);$("pauseNotice").classList.toggle("hidden",!paused)}
 function tick(){if(paused||busy)return;let left=Math.max(0,remainingMs-(performance.now()-startTime));$("timerbar").style.width=(left/150)+"%";if(left<=0)finish(null)}
@@ -138,7 +160,7 @@ function adaptivePool(level){let out=[];
 function chooseAdaptive(s){let p=adaptivePool(s.level);if(!p.length)return null;if(!Array.isArray(s.used[s.level]))s.used[s.level]=[];let used=s.used[s.level];let unused=p.filter(c=>!used.includes(canon(c.a,c.b)));if(!unused.length){s.used[s.level]=[];used=s.used[s.level];unused=p}
  let choices=unused.filter(c=>canon(c.a,c.b)!==lastCardKey);if(choices.length)unused=choices;let c=unused[Math.floor(Math.random()*unused.length)];if(!c)return null;s.used[s.level].push(canon(c.a,c.b));save();return c
 }
-function pick(){stopTimers();let s=student(currentName);
+function pick(){stopTimers();let s=student(currentName);updateStars();save();
  if(s.mode==="zettel"){let available=s.cards.filter(c=>c.box<6);if(!available.length){showDiploma();return}let others=available.filter(c=>key(c)!==lastCardKey);if(others.length)available=others;const weights=[0,65,15,9,6,4];let total=available.reduce((n,c)=>n+weights[c.box],0),r=Math.random()*total;card=available.find(c=>(r-=weights[c.box])<0)||available[0];lastCardKey=key(card)}
  else{card=chooseAdaptive(s);if(!card){s.mode="zettel";normalizeZettelCards(s);save();return pick()}lastCardKey=canon(card.a,card.b)}
  busy=false;paused=false;setAnswer("");$("task").textContent=(card.a+card.b)+" − "+card.b+" =";$("feedback").textContent="";$("selectedInfo").textContent="Übungsbereich: "+label(s);updatePause();if(s.mode==="zettel"){remainingMs=15000;$("timerbar").parentElement.classList.remove("hidden");startTime=performance.now();timerId=setInterval(tick,50);tick()}else{remainingMs=15000;$("timerbar").parentElement.classList.add("hidden");$("timerbar").style.width="100%"}
@@ -146,10 +168,10 @@ function pick(){stopTimers();let s=student(currentName);
 function finish(value){if(busy||paused||!card)return;busy=true;clearInterval(timerId);timerId=null;let s=student(currentName),solution=card.a,correct=value!==null&&Number(value)===solution;
  if(s.mode==="zettel"){if(value!==null){if(correct)card.box=Math.min(6,card.box+1);else card.box=1}}
  else if(value!==null){if(correct)s.right++;else s.wrong++;
-   if(s.right>=10){s.level=Math.min(6,s.level+1);s.right=0;s.wrong=0}
+   if(s.right>=10){if(s.level===6)s.topStarRounds=Math.min(4,(Number(s.topStarRounds)||0)+1);s.level=Math.min(6,s.level+1);s.right=0;s.wrong=0}
    else if(s.wrong>=5){if(s.level===0){s.mode="zettel";s.cards=zPool()}else s.level--;s.right=0;s.wrong=0}
  }
- setAnswer(String(solution));$("feedback").textContent="";save();nextId=setTimeout(()=>{busy=false;nextId=null;pick()},2000)
+ setAnswer(String(solution));$("feedback").textContent="";updateStars();save();nextId=setTimeout(()=>{busy=false;nextId=null;pick()},2000)
 }
 function submit(){if(!answer)return;finish(answer)}
 function showDiploma(){$("dname").textContent=currentName;$("overlay").classList.remove("hidden")}
